@@ -53,7 +53,7 @@ Create `~/.pi/agent/rtk-config.json`:
   "techniques": {
     "ansiStripping": true,
     "truncation": { "enabled": true, "maxChars": 10000 },
-    "sourceCodeFiltering": "minimal",
+    "sourceCodeFiltering": { "enabled": true, "level": "minimal" },
     "smartTruncation": { "enabled": true, "maxLines": 200 },
     "testOutputAggregation": true,
     "buildOutputFiltering": true,
@@ -66,15 +66,30 @@ Create `~/.pi/agent/rtk-config.json`:
 
 ### Filter Levels
 
-- `none`: No filtering applied
 - `minimal`: Remove comments, normalize whitespace
 - `aggressive`: Keep only signatures and structure
+
+Source code filtering can be toggled independently of its level via commands or the `rtk_configure` tool.
 
 ## Commands
 
 - `/rtk-stats` - Show token savings statistics
-- `/rtk-toggle` - Enable/disable token reduction
+- `/rtk-on` / `/rtk-off` - Enable/disable token reduction
 - `/rtk-clear` - Clear metrics history
+- `/rtk-what` - Show current technique configuration
+- `/rtk-toggle-ansiStripping` - Toggle ANSI stripping
+- `/rtk-toggle-truncation` - Toggle output truncation
+- `/rtk-toggle-sourceCodeFiltering` - Toggle source code filtering
+- `/rtk-toggle-smartTruncation` - Toggle smart truncation
+- `/rtk-toggle-testOutputAggregation` - Toggle test output aggregation
+- `/rtk-toggle-buildOutputFiltering` - Toggle build output filtering
+- `/rtk-toggle-gitCompaction` - Toggle git compaction
+- `/rtk-toggle-searchResultGrouping` - Toggle search result grouping
+- `/rtk-toggle-linterAggregation` - Toggle linter aggregation
+
+## Agent Tool
+
+The `rtk_configure` tool is registered for use by the AI agent to programmatically adjust any RTK parameter at runtime. This is particularly useful when file edits fail due to text-matching errors: the agent can temporarily disable `sourceCodeFiltering`, re-read the file, apply the edit, and re-enable filtering.
 
 ## Supported Languages
 
