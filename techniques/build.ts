@@ -63,8 +63,27 @@ export function isBuildCommand(command: string | undefined | null): boolean {
 		return false;
 	}
 
-	const cmdLower = command.toLowerCase();
-	return BUILD_COMMANDS.some((bc) => cmdLower.includes(bc.toLowerCase()));
+	// Strip leading env assignments (FOO=bar BAZ=qux cmd ...).
+	const stripped = command
+		.toLowerCase()
+		.replace(/^\s*(?:[a-z_][a-z0-9_]*=\S*\s+)*/, "");
+
+	// First token -- handles leading &&, |, ;, ( etc.
+	const firstToken = stripped.split(/[\s|;&(]/, 1)[0].trim();
+	if (!firstToken) return false;
+
+	// Strip any path prefix to bare executable name.
+	const executable = firstToken.replace(/^.*\//, "");
+
+	return BUILD_COMMANDS.some((bc) => {
+		const parts = bc.toLowerCase().split(/\s+/);
+		if (parts.length === 1) {
+			return executable === parts[0];
+		}
+		// Multi-token build (e.g. "cargo build"): check first N tokens.
+		const cmdTokens = stripped.split(/\s+/).slice(0, parts.length);
+		return parts.every((p, i) => cmdTokens[i] === p);
+	});
 }
 
 export function filterBuildOutput(
@@ -146,7 +165,8 @@ export function filterBuildOutput(
 
 	// Format output
 	if (stats.errors.length === 0 && stats.warnings.length === 0) {
-		return `✓ Build successful (${stats.compiled} units compiled)`;
+		// Don't collapse clean builds -- preserve raw output for context.
+		return null;
 	}
 
 	const result: string[] = [];

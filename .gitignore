@@ -1,4 +1,15 @@
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Node
 node_modules/
-*.bak
-.debug.log
-*.tgz
+package-lock.json
+
+# Build output
+dist/
+*.tsbuildinfo

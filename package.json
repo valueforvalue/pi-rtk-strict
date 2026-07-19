@@ -1,7 +1,7 @@
 {
-  "name": "pi-rtk",
-  "version": "0.1.4",
-  "description": "RTK token reduction extension for pi-coding-agent - reduces LLM token consumption 60-90% by intelligently filtering tool output",
+  "name": "pi-rtk-strict",
+  "version": "0.1.4-strict.1",
+  "description": "RTK token reduction extension for pi-coding-agent - fork of pi-rtk with strict executable-only command matchers to prevent false positives",
   "type": "module",
   "main": "index.ts",
   "pi": {
@@ -26,14 +26,14 @@
     "rtk",
     "ai"
   ],
-  "author": "Matt Cowger",
+  "author": "Matt Cowger (original), valueforvalue (strict fork)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mcowger/pi-rtk.git"
+    "url": "git+https://github.com/valueforvalue/pi-rtk-strict.git"
   },
   "bugs": {
-    "url": "https://github.com/mcowger/pi-rtk/issues"
+    "url": "https://github.com/valueforvalue/pi-rtk-strict/issues"
   },
-  "homepage": "https://github.com/mcowger/pi-rtk#readme"
+  "homepage": "https://github.com/valueforvalue/pi-rtk-strict#readme"
 }

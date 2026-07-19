@@ -39,11 +39,26 @@ export function isTestCommand(command: string | undefined | null): boolean {
 		return false;
 	}
 
-	const cmdLower = command.toLowerCase();
+	// Strip leading env assignments (FOO=bar BAZ=qux cmd ...).
+	const stripped = command
+		.toLowerCase()
+		.replace(/^\s*(?:[a-z_][a-z0-9_]*=\S*\s+)*/, "");
+
+	// First token -- handles leading &&, |, ;, ( etc.
+	const firstToken = stripped.split(/[\s|;&(]/, 1)[0].trim();
+	if (!firstToken) return false;
+
+	// Strip any path prefix to bare executable name.
+	const executable = firstToken.replace(/^.*\//, "");
+
 	return TEST_COMMANDS.some((tc) => {
-		const escaped = tc.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-		// Match the test command only when it appears as a whole token (not as part of a longer word like "latest")
-		return new RegExp(`(?:^|[\\s|;&])${escaped}(?:[\\s|;&]|$)`).test(cmdLower);
+		const parts = tc.toLowerCase().split(/\s+/);
+		if (parts.length === 1) {
+			return executable === parts[0];
+		}
+		// Multi-token test (e.g. "cargo test"): check first N tokens.
+		const cmdTokens = stripped.split(/\s+/).slice(0, parts.length);
+		return parts.every((p, i) => cmdTokens[i] === p);
 	});
 }
 
@@ -140,6 +155,12 @@ export function aggregateTestOutput(
 		if (inFailure && currentFailure.length > 0) {
 			summary.failures.push(currentFailure.join("\n"));
 		}
+	}
+
+	// On a clean run (no failures), preserve raw output for context.
+	// Aggregation only earns its keep when there are failures to surface.
+	if (summary.failed === 0) {
+		return null;
 	}
 
 	// Format output
